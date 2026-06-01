@@ -19,11 +19,15 @@
     })
   ];
 
-  boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+  boot.binfmt.emulatedSystems = [ "x86_64-linux" "i386-linux" "i686-linux" ];
   boot.binfmt.preferStaticEmulators = true;
 
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
+  };
+
+  environment.shellAliases = {
+    runx64 = "podman run --platform linux/amd64 --rm -it";
   };
 }

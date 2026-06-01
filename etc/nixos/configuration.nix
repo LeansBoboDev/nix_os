@@ -33,6 +33,18 @@
       KbdInteractiveAuthentication = false;
     };
   };
+
+  # Wheel users don't need password, normal users can't use "su" for security porpuses
+  security.sudo.wheelNeedsPassword = false;
+  security.pam.services.su = {
+    text = ''
+      auth required pam_wheel.so use_uid deny group=nosu
+      auth sufficient pam_wheel.so trust use_uid
+      auth required pam_unix.so
+      account required pam_unix.so
+      session required pam_unix.so
+    '';
+  };
   
   # Users
   users.users.admin = {
@@ -49,7 +61,12 @@
     wget
     sudo
     htop
+    tmux
+    file
+    binutils
   ];
+
+  security.pam.services.su.startSession = true;
 
   networking.firewall.enable = false;
 
