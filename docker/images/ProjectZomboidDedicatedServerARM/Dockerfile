@@ -6,6 +6,7 @@ ENV PZ_DATA_PATH="/root/Zomboid"
 
 RUN dpkg --add-architecture i386 && \
     dpkg --add-architecture armhf && \
+    dpkg --add-architecture amd64 && \
     apt-get update && apt-get install -y \
     ca-certificates \
     curl \
@@ -13,6 +14,9 @@ RUN dpkg --add-architecture i386 && \
     libstdc++6 \
     zlib1g \
     libgcc-s1 \
+    libc6:amd64 \
+    libstdc++6:amd64 \
+    zlib1g:amd64 \
     python3 \
     git \
     cmake \
