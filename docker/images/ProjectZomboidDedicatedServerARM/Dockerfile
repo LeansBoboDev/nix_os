@@ -35,7 +35,7 @@ RUN dpkg --add-architecture i386 && \
 RUN git clone https://github.com/ptitSeb/box64.git /tmp/box64 && \
     mkdir -p /tmp/box64/build && \
     cd /tmp/box64/build && \
-    cmake .. -DARM_DYNAREC=ON && \
+    cmake .. -DARM_DYNAREC=ON -DBOX32=ON -DBOX32_BINFMT=ON && \
     make -j$(nproc) && \
     make install && \
     ldconfig && \
