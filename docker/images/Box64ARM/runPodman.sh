@@ -16,9 +16,11 @@ elif podman ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
   podman start -ai $CONTAINER_NAME
 else
   echo "Creating container..."
+  mkdir -p "$HOME/app"
   podman run -it \
     --cgroup-manager=cgroupfs \
     --pull=never \
     --name box64 \
+    -v "$HOME/app:/root/app" \
     localhost/box64 bash
 fi

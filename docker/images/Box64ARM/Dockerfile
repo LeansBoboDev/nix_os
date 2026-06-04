@@ -3,6 +3,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ENV APP_PATH="/root/app"
 
+RUN mkdir -p "$APP_PATH"
+
 RUN dpkg --add-architecture i386 && \
     dpkg --add-architecture armhf && \
     dpkg --add-architecture amd64 && \
