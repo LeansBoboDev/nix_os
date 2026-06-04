@@ -1,8 +1,7 @@
 FROM debian:bookworm
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV PZ_SERVER_PATH="/root/ProjectZomboidDedicatedServer"
-ENV PZ_DATA_PATH="/root/Zomboid"
+ENV APP_PATH="/root/app"
 
 RUN dpkg --add-architecture i386 && \
     dpkg --add-architecture armhf && \

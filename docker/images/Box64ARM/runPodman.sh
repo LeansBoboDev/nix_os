@@ -1,6 +1,6 @@
 #!/bin/bash
-IMAGE_NAME="localhost/projectzomboid"
-CONTAINER_NAME="projectzomboid"
+IMAGE_NAME="localhost/box64"
+CONTAINER_NAME="box64"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [ -z "$(podman images -q "$IMAGE_NAME" 2>/dev/null)" ]; then
@@ -16,13 +16,9 @@ elif podman ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
   podman start -ai $CONTAINER_NAME
 else
   echo "Creating container..."
-  mkdir -p "$HOME/ProjectZomboidDedicatedServer/Zomboid"
   podman run -it \
     --cgroup-manager=cgroupfs \
     --pull=never \
-    --name projectzomboid \
-    -v "$HOME/ProjectZomboidDedicatedServer:/root/ProjectZomboidDedicatedServer" \
-    -v "$HOME/ProjectZomboidDedicatedServer/Zomboid:/root/Zomboid" \
-    -v "$HOME/SteamCMD:/root/SteamCMD" \
-    localhost/projectzomboid bash
+    --name box64 \
+    localhost/box64 bash
 fi

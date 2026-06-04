@@ -20,9 +20,10 @@
 
   networking.hostName = "br1-instance2";
   networking.networkmanager.enable = true;
+  networking.firewall.enable = false;
 
   # Time zone.
-  time.timeZone = "Amerca/SaoPaulo";
+  time.timeZone = "America/SaoPaulo";
 
   # Open SSH
   services.openssh = {
@@ -34,7 +35,7 @@
     };
   };
 
-  # Wheel users don't need password, normal users can't use "su" for security porpuses
+  # Goodies for administrators (no passwords)
   security.sudo.wheelNeedsPassword = false;
   security.pam.services.su = {
     text = ''
@@ -57,18 +58,16 @@
 
   # System Packages
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim
     wget
     sudo
     htop
     tmux
     file
     binutils
+    box64
+    box86
   ];
-
-  security.pam.services.su.startSession = true;
-
-  networking.firewall.enable = false;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
