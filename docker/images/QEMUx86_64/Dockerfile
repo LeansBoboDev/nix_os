@@ -30,6 +30,7 @@ RUN dpkg --add-architecture i386 && \
     libfontconfig1:i386 \
     libgl1:i386 \
     libgl1-mesa-dri:i386 \
+    tmux \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
