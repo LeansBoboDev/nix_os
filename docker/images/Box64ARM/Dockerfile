@@ -25,6 +25,8 @@ RUN dpkg --add-architecture i386 && \
     build-essential \
     libc6:i386 \
     libstdc++6:i386 \
+    libncurses5:i386 \
+    libtinfo5:i386 \
     libgcc-s1:i386 \
     gcc-arm-linux-gnueabihf \
     g++-arm-linux-gnueabihf \
