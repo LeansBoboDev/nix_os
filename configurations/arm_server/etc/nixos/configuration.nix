@@ -6,6 +6,7 @@
       ./hardware-configuration.nix
       ./podman.nix
       ./mdns.nix
+      ./packages.nix
     ];
 
   nix.settings = {
@@ -18,7 +19,7 @@
   # Enables the generation of /boot/extlinux/extlinux.conf
   boot.loader.generic-extlinux-compatible.enable = true;
 
-  networking.hostName = "br1-instance2";
+  networking.hostName = "dont_forget_to_change_the_machine_name_here_alright_interrogation_pontuation";
   networking.networkmanager.enable = true;
   networking.firewall.enable = false;
 
@@ -55,19 +56,6 @@
       tree
     ];
   };
-
-  # System Packages
-  environment.systemPackages = with pkgs; [
-    vim
-    wget
-    sudo
-    htop
-    tmux
-    file
-    binutils
-    box64
-    box86
-  ];
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
