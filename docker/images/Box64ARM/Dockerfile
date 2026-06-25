@@ -7,7 +7,6 @@ RUN mkdir -p "$APP_PATH"
 
 RUN dpkg --add-architecture i386 && \
     dpkg --add-architecture armhf && \
-    dpkg --add-architecture amd64 && \
     apt-get update && apt-get install -y \
     ca-certificates \
     curl \
@@ -15,9 +14,6 @@ RUN dpkg --add-architecture i386 && \
     libstdc++6 \
     zlib1g \
     libgcc-s1 \
-    libc6:amd64 \
-    libstdc++6:amd64 \
-    zlib1g:amd64 \
     python3 \
     git \
     cmake \
@@ -33,12 +29,19 @@ RUN dpkg --add-architecture i386 && \
     libc6-dev-armhf-cross \
     libc6:armhf \
     libstdc++6:armhf \
-    libgcc-s1:armhf
+    libgcc-s1:armhf \
+    libsdl2-2.0-0:i386 \
+    libopenal1:i386 \
+    libglib2.0-0:i386 \
+    libfontconfig1:i386 \
+    libgl1:i386 \
+    libgl1-mesa-dri:i386 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/ptitSeb/box64.git /tmp/box64 && \
     mkdir -p /tmp/box64/build && \
     cd /tmp/box64/build && \
-    cmake .. -DARM_DYNAREC=ON -DBOX32=ON -DBOX32_BINFMT=ON && \
+    cmake .. -DARM_DYNAREC=ON -DBOX32=ON -DBOX32_BINFMT=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
     make -j$(nproc) && \
     make install && \
     ldconfig && \
@@ -51,10 +54,18 @@ RUN git clone https://github.com/ptitSeb/box86.git /tmp/box86 && \
              -DCMAKE_SYSTEM_NAME=Linux \
              -DCMAKE_SYSTEM_PROCESSOR=arm \
              -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc \
-             -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ && \
+             -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ \
+             -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
     make -j$(nproc) && \
     make install && \
     ldconfig && \
     rm -rf /tmp/box86
+
+RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    useradd -m -s /bin/bash admin && \
+    echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER admin
+WORKDIR /home/admin
 
 CMD ["/bin/bash"]
