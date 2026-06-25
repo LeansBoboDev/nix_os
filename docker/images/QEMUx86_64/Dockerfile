@@ -37,6 +37,14 @@ RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/li
     useradd -m -s /bin/bash admin && \
     echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+ARG INSTALL_STEAMCMD=true
+RUN if [ "$INSTALL_STEAMCMD" = "true" ]; then \
+    mkdir -p /opt/steamcmd && \
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C /opt/steamcmd && \
+    chmod -R 755 /opt/steamcmd && \
+    ln -s /opt/steamcmd/steamcmd.sh /usr/local/bin/steamcmd; \
+    fi
+
 USER admin
 WORKDIR /home/admin
 

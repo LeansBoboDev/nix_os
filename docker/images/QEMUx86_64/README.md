@@ -7,6 +7,8 @@ Debian x86_64 container with common runtime dependencies for running x86_64 and 
 - Build
 ```bash
 podman build --cgroup-manager=cgroupfs --runtime=runc -t x86_64 .
+# OR without steamcmd
+podman build --cgroup-manager=cgroupfs --runtime=runc --build-arg INSTALL_STEAMCMD=false -t x86_64 .
 ```
 - Save
 ```bash
