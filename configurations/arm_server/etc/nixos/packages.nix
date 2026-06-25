@@ -9,7 +9,6 @@
     tmux
     file
     binutils
-    box64
     box86
   ];
 }
