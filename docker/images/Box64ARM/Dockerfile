@@ -49,20 +49,6 @@ RUN git clone https://github.com/ptitSeb/box64.git /tmp/box64 && \
     ldconfig && \
     rm -rf /tmp/box64
 
-RUN git clone https://github.com/ptitSeb/box86.git /tmp/box86 && \
-    mkdir -p /tmp/box86/build && \
-    cd /tmp/box86/build && \
-    cmake .. -DARM_DYNAREC=ON \
-             -DCMAKE_SYSTEM_NAME=Linux \
-             -DCMAKE_SYSTEM_PROCESSOR=arm \
-             -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc \
-             -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ \
-             -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
-    make -j$(nproc) && \
-    make install && \
-    ldconfig && \
-    rm -rf /tmp/box86
-
 RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
     groupadd -f wheel && \
     echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \

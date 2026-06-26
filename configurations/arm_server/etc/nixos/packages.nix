@@ -10,6 +10,5 @@
     file
     git
     binutils
-    box86
   ];
 }
