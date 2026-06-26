@@ -42,7 +42,8 @@ RUN if [ "$INSTALL_STEAMCMD" = "true" ]; then \
     mkdir -p /opt/steamcmd && \
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C /opt/steamcmd && \
     chmod -R 755 /opt/steamcmd && \
-    ln -s /opt/steamcmd/steamcmd.sh /usr/local/bin/steamcmd; \
+    printf '#!/bin/sh\ncd /opt/steamcmd && exec ./steamcmd.sh "$@"\n' > /usr/local/bin/steamcmd && \
+    chmod +x /usr/local/bin/steamcmd; \
     fi
 
 USER admin
