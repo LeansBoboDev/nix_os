@@ -20,7 +20,16 @@ in
     file
     git
     binutils
+
+    # Box64
     box64
+    pkgs.pkgsCross.gnu32.stdenv.cc.cc.lib
+    pkgs.pkgsCross.gnu32.glibc
+  ];
+
+  environment.sessionVariables.BOX64_LD_LIBRARY_PATH = lib.makeLibraryPath [
+    pkgs.pkgsCross.gnu32.stdenv.cc.cc.lib
+    pkgs.pkgsCross.gnu32.glibc
   ];
 
   boot.binfmt.registrations = {
