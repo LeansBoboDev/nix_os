@@ -8,6 +8,7 @@
     htop
     tmux
     file
+    git
     binutils
     box86
   ];
