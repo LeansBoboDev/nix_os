@@ -6,23 +6,23 @@ Docker image with [BOX64](https://github.com/ptitSeb/box64) and [BOX86](https://
 
 - Build
 ```bash
-podman build --cgroup-manager=cgroupfs --runtime=runc -t box64 .
+docker build -t box64 .
 ```
 - Save
 ```bash
-podman save localhost/box64 --cgroup-manager=cgroupfs --runtime=runc -o box64.tar
+docker save -o box64.tar box64
 ```
 
 ## Usage
-- Add image to the podman (you need to have the box64.tar first from the build method or download in releases)
+- Add image to docker (you need to have the box64.tar first from the build method or download in releases)
 ```bash
-mkdir -p /tmp/podman-box64 && XDG_RUNTIME_DIR=/tmp/podman-box64 podman load -i box64.tar
+docker load -i box64.tar
 ```
 - Open it
 ```bash
-XDG_RUNTIME_DIR=/tmp/podman-nmrih podman run -it --rm \
+docker run -it --rm \
   -v ~/Server:/server \
-  localhost/box64:latest /bin/bash
+  box64:latest /bin/bash
 ```
 
 ## Notes

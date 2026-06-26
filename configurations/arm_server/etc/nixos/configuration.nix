@@ -4,7 +4,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./podman.nix
+      ./docker.nix
       ./mdns.nix
       ./packages.nix
       ./users.nix

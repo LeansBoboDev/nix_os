@@ -6,25 +6,25 @@ Debian x86_64 container with common runtime dependencies for running x86_64 and 
 
 - Build
 ```bash
-podman build --cgroup-manager=cgroupfs --runtime=runc -t x86_64 .
+docker build -t x86_64 .
 # OR without steamcmd
-podman build --cgroup-manager=cgroupfs --runtime=runc --build-arg INSTALL_STEAMCMD=false -t x86_64 .
+docker build --build-arg INSTALL_STEAMCMD=false -t x86_64 .
 ```
 - Save
 ```bash
-podman save localhost/x86_64 --cgroup-manager=cgroupfs --runtime=runc -o x86_64.tar
+docker save -o x86_64.tar x86_64
 ```
 
 ## Usage
-- Add image to podman (you need to have the x86_64.tar first from the build method or download in releases)
+- Add image to docker (you need to have the x86_64.tar first from the build method or download in releases)
 ```bash
-mkdir -p /tmp/podman-x86_64 && XDG_RUNTIME_DIR=/tmp/podman-x86_64 podman load -i x86_64.tar
+docker load -i x86_64.tar
 ```
 - Open it
 ```bash
-podman run -it --rm \
+docker run -it --rm \
   -v ~/app:/root/app \
-  localhost/x86_64:latest /bin/bash
+  x86_64:latest /bin/bash
 ```
 
 ## Notes
