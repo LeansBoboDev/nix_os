@@ -18,7 +18,7 @@ in
 {
   environment.systemPackages = [ box64 ] ++ i686Libs;
 
-  environment.sessionVariables.BOX64_LD_LIBRARY_PATH = lib.makeLibraryPath i686Libs;
+  environment.sessionVariables.BOX64_LD_LIBRARY_PATH = ".:bin/:" + lib.makeLibraryPath i686Libs;
 
   boot.binfmt.registrations = {
     x86_64-linux = {
