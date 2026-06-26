@@ -27,6 +27,21 @@ docker run -it --rm \
   x86_64:latest /bin/bash
 ```
 
+## Running on ARM64 (QEMU emulation)
+
+- Run the container with explicit platform
+```bash
+docker run -it --rm \
+  --platform linux/amd64 \
+  -v ~/app:/root/app \
+  x86_64:latest /bin/bash
+```
+
+- Build for x86_64 from an ARM64 host
+```bash
+docker build --platform linux/amd64 -t x86_64 .
+```
+
 ## Notes
 
 - Based on `debian:bookworm` (x86_64 native).
