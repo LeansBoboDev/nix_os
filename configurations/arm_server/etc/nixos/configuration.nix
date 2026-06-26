@@ -8,6 +8,7 @@
       ./mdns.nix
       ./packages.nix
       ./users.nix
+      ./box64.nix
     ];
 
   nix.settings = {
