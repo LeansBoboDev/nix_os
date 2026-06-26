@@ -65,6 +65,8 @@ RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/li
     useradd -m -s /bin/bash admin && \
     echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+USER root
+RUN echo "root:root" | chpasswd
 USER admin
 WORKDIR /home/admin
 

@@ -46,6 +46,8 @@ RUN if [ "$INSTALL_STEAMCMD" = "true" ]; then \
     chmod +x /usr/local/bin/steamcmd; \
     fi
 
+USER root
+RUN echo "root:root" | chpasswd
 USER admin
 WORKDIR /home/admin
 
