@@ -45,6 +45,8 @@ RUN if [ "$INSTALL_STEAMCMD" = "true" ]; then \
     ln -s /opt/steamcmd/steamcmd.sh /usr/local/bin/steamcmd; \
     fi
 
+USER root
+RUN echo "root:root" | chpasswd
 USER admin
 WORKDIR /home/admin
 
