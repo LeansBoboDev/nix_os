@@ -8,7 +8,6 @@
       ./mdns.nix
       ./packages.nix
       ./users.nix
-      ./box64-binfmt.nix
     ];
 
   nix.settings = {
@@ -20,6 +19,8 @@
   boot.loader.grub.enable = false;
   # Enables the generation of /boot/extlinux/extlinux.conf
   boot.loader.generic-extlinux-compatible.enable = true;
+
+  #swapDevices = [{ device = "/swapfile"; size = 4096; }];
 
   networking.hostName = "dont_forget_to_change_the_machine_name_here_alright_interrogation_pontuation";
   networking.networkmanager.enable = true;
