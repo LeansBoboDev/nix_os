@@ -13,6 +13,7 @@ let
   i686Libs = [
     pkgs.pkgsCross.gnu32.stdenv.cc.cc.lib
     pkgs.pkgsCross.gnu32.glibc
+    pkgs.pkgsCross.gnu32.SDL2
   ];
 in
 {
