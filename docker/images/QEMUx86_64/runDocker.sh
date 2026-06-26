@@ -18,6 +18,7 @@ else
   echo "Creating container..."
   mkdir -p "$HOME/app"
   docker run -it \
+    --privileged \
     --platform linux/amd64 \
     --pull=never \
     --name x86_64 \

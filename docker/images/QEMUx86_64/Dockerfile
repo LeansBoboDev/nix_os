@@ -31,11 +31,14 @@ RUN dpkg --add-architecture i386 && \
     libgl1:i386 \
     libgl1-mesa-dri:i386 \
     tmux \
+    iputils-ping \
+    iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    useradd -m -s /bin/bash admin && \
-    echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    groupadd -f wheel && \
+    echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    useradd -m -s /bin/bash -G wheel admin
 
 ARG INSTALL_STEAMCMD=true
 RUN if [ "$INSTALL_STEAMCMD" = "true" ]; then \

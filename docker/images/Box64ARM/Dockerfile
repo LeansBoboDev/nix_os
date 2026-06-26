@@ -36,6 +36,8 @@ RUN dpkg --add-architecture i386 && \
     libfontconfig1:i386 \
     libgl1:i386 \
     libgl1-mesa-dri:i386 \
+    iputils-ping \
+    iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/ptitSeb/box64.git /tmp/box64 && \
@@ -62,8 +64,9 @@ RUN git clone https://github.com/ptitSeb/box86.git /tmp/box86 && \
     rm -rf /tmp/box86
 
 RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    useradd -m -s /bin/bash admin && \
-    echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    groupadd -f wheel && \
+    echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    useradd -m -s /bin/bash -G wheel admin
 
 USER root
 RUN echo "root:root" | chpasswd
