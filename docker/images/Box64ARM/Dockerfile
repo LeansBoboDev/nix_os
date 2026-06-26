@@ -2,6 +2,8 @@ FROM debian:bookworm
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV APP_PATH="/root/app"
+# Source Engine library search
+ENV BOX64_LD_LIBRARY_PATH=".:bin/:/usr/lib/i386-linux-gnu:/lib/i386-linux-gnu"
 
 RUN mkdir -p "$APP_PATH"
 
