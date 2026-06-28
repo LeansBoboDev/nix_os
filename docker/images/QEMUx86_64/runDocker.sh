@@ -23,6 +23,7 @@ else
     --platform linux/amd64 \
     --pull=never \
     --name x86_64 \
+    --network host \
     -v "$HOME/app:/root/app" \
     x86_64 bash
 fi

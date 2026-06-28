@@ -1,0 +1,11 @@
+diff --git a/src/include/box32.h b/src/include/box32.h
+--- a/src/include/box32.h
++++ b/src/include/box32.h
+@@ -54,6 +54,6 @@ static inline ptr_t to_ptrv(void* p2) {
+ static inline long_t to_long(long long l) {
+     long_t ret = (long_t)l;
+     if(l!=ret)
+-        printf_log(LOG_NONE, "Warning, long %ld is not a 32bits value\n", l);
++        printf_log(LOG_NONE, "Warning, long %ld is not a 32bits value (caller=%p)\n", l, __builtin_return_address(0));
+     return ret;
+ }

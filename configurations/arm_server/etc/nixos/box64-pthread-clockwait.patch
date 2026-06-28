@@ -1,0 +1,57 @@
+diff --git a/src/libtools/threads32.c b/src/libtools/threads32.c
+index 689be6480..371e48fad 100755
+--- a/src/libtools/threads32.c
++++ b/src/libtools/threads32.c
+@@ -41,10 +41,12 @@ typedef void (*vFppp_t)(void*, void*, void*);
+ typedef void (*vFpi_t)(void*, int);
+ typedef int  (*iFv_t)(void);
+ typedef int  (*iFLi_t)(unsigned long, int);
++typedef int  (*iFppip_t)(void*, void*, int, void*);
+ //starting with glibc 2.34+, those 2 functions are in libc.so as versioned symbol only
+ // So use dlsym to get the symbol unversioned, as simple link will not work.
+ static vFppp_t real_pthread_cleanup_push_defer = NULL;
+ static vFpi_t real_pthread_cleanup_pop_restore = NULL;
++static iFppip_t real_pthread_cond_clockwait32 = NULL;
+ // with glibc 2.34+, pthread_kill changed behaviour and might break some program, so using old version if possible
+ // it will be pthread_kill@GLIBC_2.0+, need to be found, while it's GLIBC_2.0 on i386
+ static iFLi_t real_phtread_kill_old = NULL;
+@@ -629,6 +631,19 @@ EXPORT int my32_pthread_cond_timedwait(x64emu_t* emu, void* cond, void* mutex, v
+     }
+     return pthread_cond_timedwait(c, m, atime);
+ }
++EXPORT int my32_pthread_cond_clockwait(x64emu_t* emu, void* cond, void* mutex, int clockid, void* abstime)
++{
++    pthread_mutex_t* m = getAlignedMutex((pthread_mutex_t*)mutex);
++    pthread_cond_t * c = get_cond(cond);
++    struct timespec* atime = abstime;
++    while(atime->tv_nsec>1000000000LL) {
++        atime->tv_nsec-=1000000000LL;
++        ++atime->tv_sec;
++    }
++    if(real_pthread_cond_clockwait32)
++        return real_pthread_cond_clockwait32(c, m, clockid, atime);
++    return pthread_cond_timedwait(c, m, atime);
++}
+ EXPORT int my32_pthread_cond_wait(x64emu_t* emu, void* cond, void* mutex)
+ {
+     pthread_mutex_t* m = getAlignedMutex((pthread_mutex_t*)mutex);
+@@ -1071,6 +1086,7 @@ void init_pthread_helper_32()
+     real_pthread_yield = (iFv_t)dlsym(NULL, "pthread_yield");
+     if(!real_pthread_yield)
+         real_pthread_yield = sched_yield;
++    real_pthread_cond_clockwait32 = (iFppip_t)dlsym(NULL, "pthread_cond_clockwait");
+ 
+     mapcond = kh_init(mapcond);
+ }
+diff --git a/src/wrapped32/wrappedlibpthread_private.h b/src/wrapped32/wrappedlibpthread_private.h
+index 040b749b3..0b7e3bc61 100755
+--- a/src/wrapped32/wrappedlibpthread_private.h
++++ b/src/wrapped32/wrappedlibpthread_private.h
+@@ -69,6 +69,7 @@ GOM(pthread_cond_destroy, iEEp)
+ GOM(pthread_cond_init, iEEpp)
+ GOM(pthread_cond_signal, iEEp)
+ GOM(pthread_cond_timedwait, iEEpprLL_)
++GOM(pthread_cond_clockwait, iEEppirLL_)
+ GOM(pthread_cond_wait, iEEpp)
+ GOM(pthread_create, iEEBh_ppp)
+ GOM(pthread_detach, iEEh)

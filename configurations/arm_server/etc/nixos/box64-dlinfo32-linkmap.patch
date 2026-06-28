@@ -1,0 +1,15 @@
+diff --git a/src/wrapped32/wrappedlibdl.c b/src/wrapped32/wrappedlibdl.c
+--- a/src/wrapped32/wrappedlibdl.c
++++ b/src/wrapped32/wrappedlibdl.c
+@@ -107,7 +107,10 @@ int my32_dlinfo(x64emu_t* emu, void* handle, int request, void* info)
+     switch(request) {
+         case 2: // RTLD_DI_LINKMAP
+             {
+-                *(linkmap32_t**)info = getLinkMapLib32(lib);
++                if(!lib) return -1;
++                linkmap32_t *lm32 = getLinkMapLib32(lib);
++                if(!lm32) return -1;
++                *(ptr_t*)info = to_ptrv(lm32);
+             }
+             return 0;
+         default:
