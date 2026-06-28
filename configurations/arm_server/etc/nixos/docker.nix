@@ -19,6 +19,9 @@
     })
   ];
 
+  boot.binfmt.emulatedSystems = [ "x86_64-linux" "i386-linux" "i686-linux" ];
+  boot.binfmt.preferStaticEmulators = true;
+
   virtualisation.docker = {
     enable = true;
   };
