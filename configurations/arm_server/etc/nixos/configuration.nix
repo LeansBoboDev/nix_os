@@ -9,6 +9,7 @@
       ./packages.nix
       ./users.nix
       ./box64.nix
+      ./binfmt.nix
     ];
 
   nix.settings = {
