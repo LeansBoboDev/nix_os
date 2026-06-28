@@ -3,8 +3,9 @@ IMAGE_NAME="x86_64"
 CONTAINER_NAME="x86_64"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-if [ -z "$(docker images -q "$IMAGE_NAME" 2>/dev/null)" ]; then
-  echo "Image not found, building..."
+IMAGE_PLATFORM=$(docker inspect --format '{{.Os}}/{{.Architecture}}' "$IMAGE_NAME" 2>/dev/null)
+if [ -z "$(docker images -q "$IMAGE_NAME" 2>/dev/null)" ] || [ "$IMAGE_PLATFORM" != "linux/amd64" ]; then
+  echo "Image not found or wrong platform ($IMAGE_PLATFORM), building..."
   docker build --platform linux/amd64 -t "$IMAGE_NAME" "$SCRIPT_DIR" || { echo "Build failed, aborting."; exit 1; }
 fi
 

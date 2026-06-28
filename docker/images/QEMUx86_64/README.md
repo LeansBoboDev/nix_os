@@ -6,9 +6,9 @@ Debian x86_64 container with common runtime dependencies for running x86_64 and 
 
 - Build
 ```bash
-docker build -t x86_64 .
+docker build --platform linux/amd64 -t x86_64 .
 # OR without steamcmd
-docker build --build-arg INSTALL_STEAMCMD=false -t x86_64 .
+docker build --platform linux/amd64 --build-arg INSTALL_STEAMCMD=false -t x86_64 .
 ```
 - Save
 ```bash

@@ -1,5 +1,4 @@
-ARG TARGETPLATFORM=linux/amd64
-FROM --platform=$TARGETPLATFORM debian:bookworm
+FROM debian:bookworm
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV APP_PATH="/root/app"
