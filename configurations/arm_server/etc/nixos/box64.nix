@@ -3,6 +3,10 @@
 let
   box64 = pkgs.box64.overrideAttrs (oldAttrs: {
     enableParallelBuilding = false;
+    patches = (oldAttrs.patches or []) ++ [
+      ./box64-pthread-clockwait.patch
+      ./box64-sourcemod-dlinfo32.patch
+    ];
     cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [
       "-DRPI4ARM64=1"
       "-DBOX32=ON"
@@ -13,7 +17,6 @@ let
   i686Libs = [
     pkgs.pkgsCross.gnu32.stdenv.cc.cc.lib
     pkgs.pkgsCross.gnu32.glibc
-    pkgs.pkgsCross.gnu32.SDL2
   ];
 in
 {
