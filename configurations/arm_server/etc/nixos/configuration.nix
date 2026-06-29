@@ -12,16 +12,20 @@
     ];
 
   nix.settings = {
-    max-jobs = "auto"; # All Cores
-    cores = 0; # All Cores per job
+    max-jobs = 1;
+    cores = 0;
+  };
+
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
   };
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
   boot.loader.grub.enable = false;
   # Enables the generation of /boot/extlinux/extlinux.conf
   boot.loader.generic-extlinux-compatible.enable = true;
-
-  #swapDevices = [{ device = "/swapfile"; size = 4096; }];
 
   networking.hostName = "dont_forget_to_change_the_machine_name_here_alright_interrogation_pontuation";
   networking.networkmanager.enable = true;
