@@ -10,5 +10,6 @@
     file
     git
     binutils
+    qemu
   ];
 }
