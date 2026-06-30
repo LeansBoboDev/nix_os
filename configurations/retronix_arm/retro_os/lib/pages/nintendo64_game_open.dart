@@ -35,12 +35,14 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
 
     DebugLogger.log('[Nintendo64GameOpen] core: $_n64Core');
     DebugLogger.log('[Nintendo64GameOpen] ROM: $romPath');
-    await Process.start(
-      'retroarch',
-      ['-L', _n64Core, romPath],
-      mode: ProcessStartMode.detached,
-    );
-    DebugLogger.log('[Nintendo64GameOpen] retroarch launched');
+
+    final process = await Process.start('retroarch', ['-L', _n64Core, '--fullscreen', romPath]);
+    DebugLogger.log('[Nintendo64GameOpen] retroarch launched (pid: ${process.pid})');
+
+    final exitCode = await process.exitCode;
+    DebugLogger.log('[Nintendo64GameOpen] retroarch exited with code: $exitCode');
+
+    if (mounted) Navigator.pop(context);
   }
 
   @override
