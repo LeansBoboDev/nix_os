@@ -10,6 +10,6 @@
     file
     binutils
     retroarch
-    libretro.mupen64plus_next
+    libretro.mupen64plus
   ];
 }
