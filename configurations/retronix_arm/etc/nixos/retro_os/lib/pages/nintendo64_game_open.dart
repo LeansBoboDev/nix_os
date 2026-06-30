@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
-
-const _n64Core =
-    '/run/current-system/sw/lib/retroarch/cores/mupen64plus_next_libretro.so';
+import '../utils/settings_service.dart';
 
 class Nintendo64GameOpen extends StatefulWidget {
   const Nintendo64GameOpen({super.key, required this.gameName});
@@ -33,10 +31,13 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
       return;
     }
 
-    DebugLogger.log('[Nintendo64GameOpen] core: $_n64Core');
+    final corePath = await SettingsService.instance.n64CorePath();
+    await SettingsService.instance.applyN64CoreOptions();
+
+    DebugLogger.log('[Nintendo64GameOpen] core: $corePath');
     DebugLogger.log('[Nintendo64GameOpen] ROM: $romPath');
 
-    final process = await Process.start('retroarch', ['-L', _n64Core, '--fullscreen', romPath]);
+    final process = await Process.start('retroarch', ['-L', corePath, '--fullscreen', romPath]);
     DebugLogger.log('[Nintendo64GameOpen] retroarch launched (pid: ${process.pid})');
 
     final exitCode = await process.exitCode;

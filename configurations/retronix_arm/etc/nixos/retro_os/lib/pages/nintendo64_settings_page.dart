@@ -1,0 +1,353 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import '../services/gamepad_service.dart';
+import '../utils/debug_logger.dart';
+import '../utils/settings_service.dart';
+
+class Nintendo64SettingsPage extends StatefulWidget {
+  const Nintendo64SettingsPage({super.key});
+
+  @override
+  State<Nintendo64SettingsPage> createState() => _Nintendo64SettingsPageState();
+}
+
+class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
+  late final StreamSubscription<GamepadAction> _sub;
+  int _selectedIndex = 0;
+  bool _loading = true;
+
+  // Graphic option settings (up/down to select, left/right to cycle)
+  final _resolutionOptions = const ['native', 'hd', 'fullhd', '4k'];
+  final _resolutionLabels  = const ['Nativo (240p)', 'HD (720p)', 'Full HD (1080p)', '4K (2160p)'];
+  final _msaaOptions       = const ['0', '2', '4', '8'];
+  final _msaaLabels        = const ['Desligado', '2x', '4x', '8x'];
+  final _filterOptions      = const ['nearest', 'linear'];
+  final _filterLabels       = const ['Nearest (pixelado)', 'Linear (suavizado)'];
+  final _frameDupesOptions  = const ['false', 'true'];
+  final _frameDupesLabels   = const ['Desligado', 'Ligado'];
+
+  int _resIdx        = 1; // default: hd
+  int _msaaIdx       = 0; // default: off
+  int _filterIdx     = 1; // default: linear
+  int _frameDupesIdx = 0; // default: off
+
+  String _corePath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = GamepadService.instance.actions.listen(_handleAction);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final res        = await SettingsService.instance.n64Resolution();
+    final msaa       = await SettingsService.instance.n64Msaa();
+    final filter     = await SettingsService.instance.n64TextureFilter();
+    final frameDupes = await SettingsService.instance.n64FrameDupes();
+    final core       = await SettingsService.instance.n64CorePath();
+    if (!mounted) return;
+    setState(() {
+      _resIdx        = _resolutionOptions.indexOf(res).clamp(0, _resolutionOptions.length - 1);
+      _msaaIdx       = _msaaOptions.indexOf(msaa).clamp(0, _msaaOptions.length - 1);
+      _filterIdx     = _filterOptions.indexOf(filter).clamp(0, _filterOptions.length - 1);
+      _frameDupesIdx = _frameDupesOptions.indexOf(frameDupes).clamp(0, _frameDupesOptions.length - 1);
+      _corePath      = core;
+      _loading       = false;
+    });
+  }
+
+  void _handleAction(GamepadAction action) {
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+    switch (action) {
+      case GamepadAction.up:
+        setState(() => _selectedIndex = (_selectedIndex - 1).clamp(0, 5));
+      case GamepadAction.down:
+        setState(() => _selectedIndex = (_selectedIndex + 1).clamp(0, 5));
+      case GamepadAction.left:
+        _cycleValue(-1);
+      case GamepadAction.right:
+        _cycleValue(1);
+      case GamepadAction.confirm:
+        if (_selectedIndex == 5) _resetAll();
+      case GamepadAction.back:
+        Navigator.pop(context);
+      default:
+        break;
+    }
+  }
+
+  void _cycleValue(int dir) {
+    switch (_selectedIndex) {
+      case 0:
+        final next = (_resIdx + dir).clamp(0, _resolutionOptions.length - 1);
+        if (next == _resIdx) return;
+        setState(() => _resIdx = next);
+        SettingsService.instance.setN64Resolution(_resolutionOptions[next]);
+      case 1:
+        final next = (_msaaIdx + dir).clamp(0, _msaaOptions.length - 1);
+        if (next == _msaaIdx) return;
+        setState(() => _msaaIdx = next);
+        SettingsService.instance.setN64Msaa(_msaaOptions[next]);
+      case 2:
+        final next = (_filterIdx + dir).clamp(0, _filterOptions.length - 1);
+        if (next == _filterIdx) return;
+        setState(() => _filterIdx = next);
+        SettingsService.instance.setN64TextureFilter(_filterOptions[next]);
+      case 3:
+        final next = (_frameDupesIdx + dir).clamp(0, _frameDupesOptions.length - 1);
+        if (next == _frameDupesIdx) return;
+        setState(() => _frameDupesIdx = next);
+        SettingsService.instance.setN64FrameDupes(_frameDupesOptions[next]);
+    }
+  }
+
+  Future<void> _resetAll() async {
+    await SettingsService.instance.resetN64Graphics();
+    DebugLogger.log('[Nintendo64SettingsPage] settings reset to defaults');
+    await _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 48, horizontal: 80),
+            child: Text(
+              'NINTENDO 64 — CONFIGURAÇÕES',
+              style: TextStyle(color: Colors.white54, fontSize: 16, letterSpacing: 5),
+            ),
+          ),
+          if (_loading)
+            const Expanded(
+              child: Center(child: CircularProgressIndicator(color: Colors.white)),
+            )
+          else
+            Expanded(
+              child: ListView(
+                children: [
+                  _OptionRow(
+                    icon: Icons.tv,
+                    label: 'Resolução Interna',
+                    value: _resolutionLabels[_resIdx],
+                    selected: _selectedIndex == 0,
+                    canLeft:  _resIdx > 0,
+                    canRight: _resIdx < _resolutionOptions.length - 1,
+                  ),
+                  _OptionRow(
+                    icon: Icons.blur_on,
+                    label: 'Anti-Aliasing (MSAA)',
+                    value: _msaaLabels[_msaaIdx],
+                    selected: _selectedIndex == 1,
+                    canLeft:  _msaaIdx > 0,
+                    canRight: _msaaIdx < _msaaOptions.length - 1,
+                  ),
+                  _OptionRow(
+                    icon: Icons.texture,
+                    label: 'Filtro de Textura',
+                    value: _filterLabels[_filterIdx],
+                    selected: _selectedIndex == 2,
+                    canLeft:  _filterIdx > 0,
+                    canRight: _filterIdx < _filterOptions.length - 1,
+                  ),
+                  _OptionRow(
+                    icon: Icons.speed,
+                    label: 'Frame Duplication (30fps → 60Hz)',
+                    value: _frameDupesLabels[_frameDupesIdx],
+                    selected: _selectedIndex == 3,
+                    canLeft:  _frameDupesIdx > 0,
+                    canRight: _frameDupesIdx < _frameDupesOptions.length - 1,
+                  ),
+                  _InfoRow(
+                    icon: Icons.memory,
+                    label: 'Core RetroArch',
+                    value: _corePath,
+                    selected: _selectedIndex == 4,
+                  ),
+                  _ActionRow(
+                    icon: Icons.restore,
+                    label: 'Restaurar padrões',
+                    selected: _selectedIndex == 5,
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Row widgets ──────────────────────────────────────────────────────────────
+
+class _OptionRow extends StatelessWidget {
+  const _OptionRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.selected,
+    required this.canLeft,
+    required this.canRight,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool selected;
+  final bool canLeft;
+  final bool canRight;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = selected ? Colors.black : Colors.white;
+    final fgDim = selected ? Colors.black45 : Colors.white38;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
+      margin: const EdgeInsets.symmetric(horizontal: 80, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      decoration: BoxDecoration(
+        color: selected ? Colors.white : Colors.white10,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: selected ? Colors.black : Colors.white54, size: 22),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: fg,
+                fontSize: 18,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+          if (selected) ...[
+            Icon(Icons.chevron_left, color: canLeft ? fg : fgDim, size: 20),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            value,
+            style: TextStyle(
+              color: selected ? Colors.black : Colors.white60,
+              fontSize: 16,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          if (selected) ...[
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right, color: canRight ? fg : fgDim, size: 20),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.selected,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
+      margin: const EdgeInsets.symmetric(horizontal: 80, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      decoration: BoxDecoration(
+        color: selected ? Colors.white : Colors.white10,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: selected ? Colors.black : Colors.white54, size: 22),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? Colors.black : Colors.white,
+                    fontSize: 18,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: selected ? Colors.black45 : Colors.white38,
+                    fontSize: 13,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
+    required this.icon,
+    required this.label,
+    required this.selected,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
+      margin: const EdgeInsets.symmetric(horizontal: 80, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      decoration: BoxDecoration(
+        color: selected ? Colors.white : Colors.white10,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: selected ? Colors.black : Colors.white54, size: 22),
+          const SizedBox(width: 20),
+          Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.black : Colors.white,
+              fontSize: 18,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

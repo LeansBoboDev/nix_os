@@ -34,6 +34,7 @@ class GamepadService {
       LogicalKeyboardKey.arrowRight => GamepadAction.right,
       LogicalKeyboardKey.enter || LogicalKeyboardKey.numpadEnter => GamepadAction.confirm,
       LogicalKeyboardKey.escape || LogicalKeyboardKey.backspace => GamepadAction.back,
+      LogicalKeyboardKey.f1 => GamepadAction.start,
       _ => null,
     };
     if (action != null) _controller.add(action);

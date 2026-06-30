@@ -6,6 +6,7 @@ import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
 import '../utils/dialogs.dart';
 import 'nintendo64_games_page.dart';
+import 'nintendo64_settings_page.dart';
 import 'shutdown_page.dart';
 
 class ConsoleSelectorPage extends StatefulWidget {
@@ -48,6 +49,10 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
       _showExitDialog();
       return;
     }
+    if (action == GamepadAction.start) {
+      _showSettingsDialog();
+      return;
+    }
     if (_consoles.isEmpty) return;
     switch (action) {
       case GamepadAction.up:
@@ -73,6 +78,33 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
         MaterialPageRoute(builder: (_) => const Nintendo64GamesPage()),
       );
     }
+  }
+
+  void _showSettingsDialog() {
+    DebugLogger.log('[ConsoleSelectorPage] settings dialog opened');
+    showSettingsDialog(
+      context,
+      options: [
+        SettingsOption(
+          label: 'Configurações: Nintendo 64',
+          icon: Icons.sports_esports,
+          onSelect: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const Nintendo64SettingsPage()),
+          ),
+        ),
+        SettingsOption(
+          label: 'Sobre o sistema',
+          icon: Icons.info_outline,
+          onSelect: () {},
+        ),
+        SettingsOption(
+          label: 'Desligar',
+          icon: Icons.power_settings_new,
+          onSelect: _showExitDialog,
+        ),
+      ],
+    );
   }
 
   Future<void> _showExitDialog() async {

@@ -2,6 +2,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/gamepad_service.dart';
 
+class SettingsOption {
+  const SettingsOption({required this.label, required this.icon, required this.onSelect});
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onSelect;
+}
+
+Future<void> showSettingsDialog(
+  BuildContext context, {
+  required List<SettingsOption> options,
+}) async {
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => _SettingsDialog(options: options),
+  );
+}
+
 /// Shows a yes/no confirmation dialog navigable by gamepad.
 /// Returns true if confirmed, false otherwise.
 Future<bool> showConfirmDialog(
@@ -20,6 +39,106 @@ Future<bool> showConfirmDialog(
     ),
   );
   return result ?? false;
+}
+
+class _SettingsDialog extends StatefulWidget {
+  const _SettingsDialog({required this.options});
+
+  final List<SettingsOption> options;
+
+  @override
+  State<_SettingsDialog> createState() => _SettingsDialogState();
+}
+
+class _SettingsDialogState extends State<_SettingsDialog> {
+  int _selectedIndex = 0;
+  late final StreamSubscription<GamepadAction> _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = GamepadService.instance.actions.listen(_handleAction);
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+
+  void _handleAction(GamepadAction action) {
+    switch (action) {
+      case GamepadAction.up:
+        setState(() {
+          _selectedIndex = (_selectedIndex - 1).clamp(0, widget.options.length - 1);
+        });
+      case GamepadAction.down:
+        setState(() {
+          _selectedIndex = (_selectedIndex + 1).clamp(0, widget.options.length - 1);
+        });
+      case GamepadAction.confirm:
+        Navigator.pop(context);
+        widget.options[_selectedIndex].onSelect();
+      case GamepadAction.back:
+      case GamepadAction.start:
+        Navigator.pop(context);
+      default:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.grey[900],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'CONFIGURAÇÕES',
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 14,
+                letterSpacing: 4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ...List.generate(widget.options.length, (i) {
+              final opt = widget.options[i];
+              final selected = i == _selectedIndex;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 120),
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                decoration: BoxDecoration(
+                  color: selected ? Colors.white : Colors.white10,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(opt.icon, color: selected ? Colors.black : Colors.white70, size: 22),
+                    const SizedBox(width: 16),
+                    Text(
+                      opt.label,
+                      style: TextStyle(
+                        color: selected ? Colors.black : Colors.white,
+                        fontSize: 18,
+                        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ConfirmDialog extends StatefulWidget {
