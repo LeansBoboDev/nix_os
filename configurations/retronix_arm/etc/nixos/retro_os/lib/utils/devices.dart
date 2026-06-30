@@ -2,8 +2,20 @@ import 'dart:io';
 import 'debug_logger.dart';
 
 String _consolesRoot() {
-  final executableDir = File(Platform.resolvedExecutable).parent.path;
-  final root = '$executableDir/Consoles';
+  String root;
+
+  if (Platform.isLinux) {
+    final xdgDataHome = Platform.environment['XDG_DATA_HOME']
+        ?? '${Platform.environment['HOME']}/.local/share';
+    root = '$xdgDataHome/retro_os/Consoles';
+  } else if (Platform.isWindows) {
+    final appData = Platform.environment['APPDATA']
+        ?? '${Platform.environment['USERPROFILE']}\\AppData\\Roaming';
+    root = '$appData\\retro_os\\Consoles';
+  } else {
+    root = '${File(Platform.resolvedExecutable).parent.path}/Consoles';
+  }
+
   DebugLogger.log('[devices] consolesRoot: $root');
   return root;
 }

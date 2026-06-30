@@ -1,4 +1,8 @@
 { pkgs, ... }:
+
+let
+  retro_os = pkgs.callPackage ./retro-os.nix {};
+in
 {
   hardware.graphics.enable = true;
 
@@ -6,7 +10,7 @@
   services.cage = {
     enable = true;
     user = "admin";
-    program = "/home/admin/retro_os";
+    program = "${retro_os}/bin/retro_os";
   };
 
   # Audio
