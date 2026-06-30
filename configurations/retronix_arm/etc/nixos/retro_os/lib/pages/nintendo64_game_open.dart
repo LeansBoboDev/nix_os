@@ -5,6 +5,8 @@ import '../services/gamepad_service.dart';
 import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
 import '../utils/settings_service.dart';
+import '../utils/app_localizations.dart';
+import '../utils/locale_service.dart';
 
 class Nintendo64GameOpen extends StatefulWidget {
   const Nintendo64GameOpen({super.key, required this.gameName});
@@ -26,16 +28,19 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
     DebugLogger.log('[Nintendo64GameOpen] opening game: ${widget.gameName}');
 
     final romPath = await getGameFilePath('Nintendo 64', widget.gameName);
+    // Safe to build localized strings after the first await (widget is mounted)
+    final l = AppLocalizations(LocaleService.instance.locale);
+
     if (romPath == null) {
       DebugLogger.log('[Nintendo64GameOpen] ROM not found for: ${widget.gameName}');
-      if (mounted) Navigator.pop(context, 'ROM não encontrada para: ${widget.gameName}');
+      if (mounted) Navigator.pop(context, l.romNotFound(widget.gameName));
       return;
     }
 
     final corePath = await SettingsService.instance.n64CorePath();
     if (!File(corePath).existsSync()) {
       DebugLogger.log('[Nintendo64GameOpen] core not found: $corePath');
-      if (mounted) Navigator.pop(context, 'Core não encontrado: $corePath');
+      if (mounted) Navigator.pop(context, l.coreNotFoundPath(corePath));
       return;
     }
 
@@ -59,18 +64,18 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
 
       if (!mounted) return;
       if (exitCode != 0 && exitCode != -15) {
-        // -15 = SIGTERM (kill normal), não é erro
-        Navigator.pop(context, 'RetroArch encerrou com erro (código $exitCode)');
+        // -15 = SIGTERM (normal kill), not an error
+        Navigator.pop(context, l.retroarchExitError(exitCode));
       } else {
         Navigator.pop(context);
       }
     } catch (e) {
       DebugLogger.log('[Nintendo64GameOpen] failed to launch retroarch: $e');
-      if (mounted) Navigator.pop(context, 'Falha ao iniciar RetroArch: $e');
+      if (mounted) Navigator.pop(context, l.retroarchLaunchError(e));
     }
   }
 
-  // Escuta Start + Select dentro de 600ms para matar o processo.
+  // Listens for Start + Select within 600ms to kill the process.
   StreamSubscription<GamepadAction> _watchExitCombo(Process process) {
     final recent = <GamepadAction>{};
 
@@ -90,6 +95,7 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
@@ -99,7 +105,7 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
             const CircularProgressIndicator(color: Colors.white54),
             const SizedBox(height: 32),
             Text(
-              'Abrindo ${widget.gameName}',
+              l.openingGame(widget.gameName),
               style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 20,
@@ -107,9 +113,9 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Start + Select para sair',
-              style: TextStyle(color: Colors.white24, fontSize: 13),
+            Text(
+              l.startSelectToExit,
+              style: const TextStyle(color: Colors.white24, fontSize: 13),
             ),
           ],
         ),

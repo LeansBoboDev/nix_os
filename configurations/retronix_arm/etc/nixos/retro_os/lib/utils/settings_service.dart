@@ -130,6 +130,21 @@ class SettingsService {
     await _save();
   }
 
+  // ── Language ──────────────────────────────────────────────────────────────
+
+  Future<String> language() async {
+    await _ensureLoaded();
+    return (_data['language'] as String?) ?? 'en_us';
+  }
+
+  Future<void> setLanguage(String value) async {
+    await _ensureLoaded();
+    _data['language'] = value;
+    await _save();
+  }
+
+  // ── Reset ─────────────────────────────────────────────────────────────────
+
   Future<void> resetN64Graphics() async {
     await _ensureLoaded();
     _data

@@ -13,11 +13,12 @@ class SettingsOption {
 Future<void> showSettingsDialog(
   BuildContext context, {
   required List<SettingsOption> options,
+  required String title,
 }) async {
   await showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => _SettingsDialog(options: options),
+    builder: (_) => _SettingsDialog(options: options, title: title),
   );
 }
 
@@ -26,8 +27,8 @@ Future<void> showSettingsDialog(
 Future<bool> showConfirmDialog(
   BuildContext context, {
   required String message,
-  String labelYes = 'Sim',
-  String labelNo = 'Não',
+  String labelYes = 'Yes',
+  String labelNo = 'No',
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -42,9 +43,10 @@ Future<bool> showConfirmDialog(
 }
 
 class _SettingsDialog extends StatefulWidget {
-  const _SettingsDialog({required this.options});
+  const _SettingsDialog({required this.options, required this.title});
 
   final List<SettingsOption> options;
+  final String title;
 
   @override
   State<_SettingsDialog> createState() => _SettingsDialogState();
@@ -98,9 +100,9 @@ class _SettingsDialogState extends State<_SettingsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'CONFIGURAÇÕES',
-              style: TextStyle(
+            Text(
+              widget.title,
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
                 letterSpacing: 4,

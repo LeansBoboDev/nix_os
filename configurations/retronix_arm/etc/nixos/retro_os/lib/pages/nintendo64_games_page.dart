@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/gamepad_service.dart';
 import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
+import '../utils/app_localizations.dart';
 import 'nintendo64_game_open.dart';
 
 class Nintendo64GamesPage extends StatefulWidget {
@@ -102,6 +103,7 @@ class _Nintendo64GamesPageState extends State<Nintendo64GamesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
@@ -117,21 +119,21 @@ class _Nintendo64GamesPageState extends State<Nintendo64GamesPage> {
               ),
             ),
           ),
-          Expanded(child: _buildBody()),
+          Expanded(child: _buildBody(l)),
         ],
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AppLocalizations l) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
     if (_games.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Nenhum jogo encontrado.',
-          style: TextStyle(color: Colors.white30, fontSize: 16),
+          l.noGameFound,
+          style: const TextStyle(color: Colors.white30, fontSize: 16),
         ),
       );
     }

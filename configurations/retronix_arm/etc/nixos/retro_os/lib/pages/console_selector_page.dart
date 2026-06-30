@@ -5,7 +5,9 @@ import 'dart:io';
 import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
 import '../utils/dialogs.dart';
+import '../utils/app_localizations.dart';
 import 'nintendo64_games_page.dart';
+import 'system_settings_page.dart';
 import 'nintendo64_settings_page.dart';
 import 'shutdown_page.dart';
 
@@ -82,11 +84,13 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
 
   void _showSettingsDialog() {
     DebugLogger.log('[ConsoleSelectorPage] settings dialog opened');
+    final l = AppLocalizations.of(context);
     showSettingsDialog(
       context,
+      title: l.settingsDialogTitle,
       options: [
         SettingsOption(
-          label: 'Configurações: Nintendo 64',
+          label: l.settingsNintendo64,
           icon: Icons.sports_esports,
           onSelect: () => Navigator.push(
             context,
@@ -94,12 +98,20 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
           ),
         ),
         SettingsOption(
-          label: 'Sobre o sistema',
+          label: l.systemSettingsTitle,
+          icon: Icons.settings,
+          onSelect: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SystemSettingsPage()),
+          ),
+        ),
+        SettingsOption(
+          label: l.aboutSystem,
           icon: Icons.info_outline,
           onSelect: () {},
         ),
         SettingsOption(
-          label: 'Desligar',
+          label: l.shutdown,
           icon: Icons.power_settings_new,
           onSelect: _showExitDialog,
         ),
@@ -109,14 +121,18 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
 
   Future<void> _showExitDialog() async {
     DebugLogger.log('[ConsoleSelectorPage] exit dialog opened');
+    final l = AppLocalizations.of(context);
 
     final confirmed = await showConfirmDialog(
       context,
-      message: 'Deseja desligar o sistema?',
+      message: l.shutdownConfirm,
+      labelYes: l.yes,
+      labelNo: l.no,
     );
 
     DebugLogger.log('[ConsoleSelectorPage] exit dialog closed — confirmed: $confirmed');
 
+    if (!mounted) return;
     if (confirmed) {
       Navigator.pushAndRemoveUntil(
         context,
@@ -128,36 +144,37 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 48),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48),
             child: Text(
-              'SELECT CONSOLE',
-              style: TextStyle(
+              l.selectConsole,
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 18,
                 letterSpacing: 6,
               ),
             ),
           ),
-          Expanded(child: _buildBody()),
+          Expanded(child: _buildBody(l)),
         ],
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AppLocalizations l) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
     if (_consoles.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Nenhum console encontrado.',
-          style: TextStyle(color: Colors.white30, fontSize: 16),
+          l.noConsoleFound,
+          style: const TextStyle(color: Colors.white30, fontSize: 16),
         ),
       );
     }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../utils/debug_logger.dart';
+import '../utils/app_localizations.dart';
 
 class ShutdownPage extends StatefulWidget {
   const ShutdownPage({super.key});
@@ -27,17 +28,18 @@ class _ShutdownPageState extends State<ShutdownPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final l = AppLocalizations.of(context);
+    return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: Colors.white54),
-            SizedBox(height: 32),
+            const CircularProgressIndicator(color: Colors.white54),
+            const SizedBox(height: 32),
             Text(
-              'Desligando Sistema...',
-              style: TextStyle(
+              l.shuttingDown,
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 20,
                 letterSpacing: 3,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/gamepad_service.dart';
 import '../utils/debug_logger.dart';
 import '../utils/settings_service.dart';
+import '../utils/app_localizations.dart';
 
 class Nintendo64SettingsPage extends StatefulWidget {
   const Nintendo64SettingsPage({super.key});
@@ -17,20 +18,15 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
   int _selectedIndex = 0;
   bool _loading = true;
 
-  // Graphic option settings (up/down to select, left/right to cycle)
   final _resolutionOptions = const ['native', 'hd', 'fullhd', '4k'];
-  final _resolutionLabels  = const ['Nativo (240p)', 'HD (720p)', 'Full HD (1080p)', '4K (2160p)'];
   final _msaaOptions       = const ['0', '2', '4', '8'];
-  final _msaaLabels        = const ['Desligado', '2x', '4x', '8x'];
-  final _filterOptions      = const ['nearest', 'linear'];
-  final _filterLabels       = const ['Nearest (pixelado)', 'Linear (suavizado)'];
-  final _frameDupesOptions  = const ['false', 'true'];
-  final _frameDupesLabels   = const ['Desligado', 'Ligado'];
+  final _filterOptions     = const ['nearest', 'linear'];
+  final _frameDupesOptions = const ['false', 'true'];
 
-  int _resIdx        = 1; // default: hd
-  int _msaaIdx       = 0; // default: off
-  int _filterIdx     = 1; // default: linear
-  int _frameDupesIdx = 0; // default: off
+  int _resIdx        = 1;
+  int _msaaIdx       = 0;
+  int _filterIdx     = 1;
+  int _frameDupesIdx = 0;
 
   String _corePath   = '';
   bool   _coreExists = true;
@@ -119,16 +115,17 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 48, horizontal: 80),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 80),
             child: Text(
-              'NINTENDO 64 — CONFIGURAÇÕES',
-              style: TextStyle(color: Colors.white54, fontSize: 16, letterSpacing: 5),
+              l.nintendo64SettingsTitle,
+              style: const TextStyle(color: Colors.white54, fontSize: 16, letterSpacing: 5),
             ),
           ),
           if (_loading)
@@ -141,43 +138,45 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
                 children: [
                   _OptionRow(
                     icon: Icons.tv,
-                    label: 'Resolução Interna',
-                    value: _resolutionLabels[_resIdx],
+                    label: l.internalResolution,
+                    value: l.resolutionLabels[_resIdx],
                     selected: _selectedIndex == 0,
                     canLeft:  _resIdx > 0,
                     canRight: _resIdx < _resolutionOptions.length - 1,
                   ),
                   _OptionRow(
                     icon: Icons.blur_on,
-                    label: 'Anti-Aliasing (MSAA)',
-                    value: _msaaLabels[_msaaIdx],
+                    label: l.antiAliasing,
+                    value: l.msaaLabels[_msaaIdx],
                     selected: _selectedIndex == 1,
                     canLeft:  _msaaIdx > 0,
                     canRight: _msaaIdx < _msaaOptions.length - 1,
                   ),
                   _OptionRow(
                     icon: Icons.texture,
-                    label: 'Filtro de Textura',
-                    value: _filterLabels[_filterIdx],
+                    label: l.textureFilter,
+                    value: l.filterLabels[_filterIdx],
                     selected: _selectedIndex == 2,
                     canLeft:  _filterIdx > 0,
                     canRight: _filterIdx < _filterOptions.length - 1,
                   ),
                   _OptionRow(
                     icon: Icons.speed,
-                    label: 'Frame Duplication (30fps → 60Hz)',
-                    value: _frameDupesLabels[_frameDupesIdx],
+                    label: l.frameDuplication,
+                    value: l.frameDupesLabels[_frameDupesIdx],
                     selected: _selectedIndex == 3,
                     canLeft:  _frameDupesIdx > 0,
                     canRight: _frameDupesIdx < _frameDupesOptions.length - 1,
                   ),
                   _CoreInfoRow(
+                    label: l.coreRetroArch,
+                    notFoundMessage: l.coreFileNotFound,
                     path: _corePath,
                     exists: _coreExists,
                   ),
                   _ActionRow(
                     icon: Icons.restore,
-                    label: 'Restaurar padrões',
+                    label: l.restoreDefaults,
                     selected: _selectedIndex == 4,
                   ),
                 ],
@@ -258,8 +257,15 @@ class _OptionRow extends StatelessWidget {
 }
 
 class _CoreInfoRow extends StatelessWidget {
-  const _CoreInfoRow({required this.path, required this.exists});
+  const _CoreInfoRow({
+    required this.label,
+    required this.notFoundMessage,
+    required this.path,
+    required this.exists,
+  });
 
+  final String label;
+  final String notFoundMessage;
   final String path;
   final bool exists;
 
@@ -282,7 +288,7 @@ class _CoreInfoRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Core RetroArch',
+                  label,
                   style: TextStyle(
                     color: exists ? Colors.white : Colors.red,
                     fontSize: 18,
@@ -299,9 +305,9 @@ class _CoreInfoRow extends StatelessWidget {
                 ),
                 if (!exists) ...[
                   const SizedBox(height: 6),
-                  const Text(
-                    'Arquivo não encontrado — os jogos não abrirão',
-                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  Text(
+                    notFoundMessage,
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
                   ),
                 ],
               ],
