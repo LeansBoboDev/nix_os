@@ -2,11 +2,11 @@
 {
   hardware.graphics.enable = true;
 
-  # cage: Wayland kiosk compositor — boots directly into retroarch, no desktop
+  # cage: Wayland kiosk compositor — boots directly into retro_os Flutter frontend
   services.cage = {
     enable = true;
     user = "admin";
-    program = "${pkgs.retroarch}/bin/retroarch";
+    program = "/home/admin/retro_os";
   };
 
   # Audio

@@ -34,6 +34,7 @@ migrate_working_dir/
 /coverage/
 pubspec.lock
 .metadata
+.flutter-plugins-dependencies
 
 # Symbolication related
 app.*.symbols

@@ -11,9 +11,9 @@ let
     };
     enableParallelBuilding = false;
     patches = (oldAttrs.patches or []) ++ [
-      ./box64-pthread-clockwait.patch
-      ./box64-dlinfo32-linkmap.patch
-      ./box64-debug-tolong.patch
+      #./box64-pthread-clockwait.patch
+      #./box64-dlinfo32-linkmap.patch
+      #./box64-debug-tolong.patch
     ];
     dontStrip = true;
     cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [

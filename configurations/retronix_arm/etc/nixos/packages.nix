@@ -9,10 +9,7 @@
     tmux
     file
     binutils
-    (retroarch.override {
-      cores = with libretro; [
-        mupen64plus
-      ];
-    })
+    retroarch
+    libretro.mupen64plus_next
   ];
 }
