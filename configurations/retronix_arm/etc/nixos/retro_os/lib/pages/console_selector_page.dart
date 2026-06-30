@@ -113,7 +113,10 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
         SettingsOption(
           label: l.shutdown,
           icon: Icons.power_settings_new,
-          onSelect: _showExitDialog,
+          onSelect: () {
+            Navigator.pop(context); // fecha o settings dialog antes
+            _showExitDialog();
+          },
         ),
       ],
     );

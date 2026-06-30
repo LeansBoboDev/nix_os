@@ -69,6 +69,7 @@ class _SettingsDialogState extends State<_SettingsDialog> {
   }
 
   void _handleAction(GamepadAction action) {
+    if (ModalRoute.of(context)?.isCurrent != true) return;
     switch (action) {
       case GamepadAction.up:
         setState(() {
@@ -79,7 +80,6 @@ class _SettingsDialogState extends State<_SettingsDialog> {
           _selectedIndex = (_selectedIndex + 1).clamp(0, widget.options.length - 1);
         });
       case GamepadAction.confirm:
-        Navigator.pop(context);
         widget.options[_selectedIndex].onSelect();
       case GamepadAction.back:
       case GamepadAction.start:
