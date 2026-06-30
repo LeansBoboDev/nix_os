@@ -83,12 +83,21 @@ class _Nintendo64GamesPageState extends State<Nintendo64GamesPage> {
     );
   }
 
-  void _launchGame() {
+  Future<void> _launchGame() async {
     final game = _games[_selectedIndex];
-    Navigator.push(
+    final error = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => Nintendo64GameOpen(gameName: game)),
     );
+    if (error != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error, style: const TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red[900],
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
 
   @override

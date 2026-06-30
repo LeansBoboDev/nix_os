@@ -24,26 +24,45 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
     DebugLogger.log('[Nintendo64GameOpen] opening game: ${widget.gameName}');
 
     final romPath = await getGameFilePath('Nintendo 64', widget.gameName);
-
     if (romPath == null) {
       DebugLogger.log('[Nintendo64GameOpen] ROM not found for: ${widget.gameName}');
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, 'ROM não encontrada para: ${widget.gameName}');
       return;
     }
 
     final corePath = await SettingsService.instance.n64CorePath();
-    await SettingsService.instance.applyN64CoreOptions();
 
-    DebugLogger.log('[Nintendo64GameOpen] core: $corePath');
-    DebugLogger.log('[Nintendo64GameOpen] ROM: $romPath');
+    if (!File(corePath).existsSync()) {
+      DebugLogger.log('[Nintendo64GameOpen] core not found: $corePath');
+      if (mounted) Navigator.pop(context, 'Core não encontrado: $corePath');
+      return;
+    }
 
-    final process = await Process.start('retroarch', ['-L', corePath, '--fullscreen', romPath]);
-    DebugLogger.log('[Nintendo64GameOpen] retroarch launched (pid: ${process.pid})');
+    try {
+      await SettingsService.instance.applyN64CoreOptions();
 
-    final exitCode = await process.exitCode;
-    DebugLogger.log('[Nintendo64GameOpen] retroarch exited with code: $exitCode');
+      DebugLogger.log('[Nintendo64GameOpen] core: $corePath');
+      DebugLogger.log('[Nintendo64GameOpen] ROM: $romPath');
 
-    if (mounted) Navigator.pop(context);
+      final process = await Process.start(
+        'retroarch',
+        ['-L', corePath, '--fullscreen', romPath],
+      );
+      DebugLogger.log('[Nintendo64GameOpen] retroarch launched (pid: ${process.pid})');
+
+      final exitCode = await process.exitCode;
+      DebugLogger.log('[Nintendo64GameOpen] retroarch exited with code: $exitCode');
+
+      if (!mounted) return;
+      if (exitCode != 0) {
+        Navigator.pop(context, 'RetroArch encerrou com erro (código $exitCode)');
+      } else {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      DebugLogger.log('[Nintendo64GameOpen] failed to launch retroarch: $e');
+      if (mounted) Navigator.pop(context, 'Falha ao iniciar RetroArch: $e');
+    }
   }
 
   @override

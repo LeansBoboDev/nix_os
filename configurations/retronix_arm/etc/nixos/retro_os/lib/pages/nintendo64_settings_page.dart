@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../services/gamepad_service.dart';
 import '../utils/debug_logger.dart';
@@ -31,7 +32,8 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
   int _filterIdx     = 1; // default: linear
   int _frameDupesIdx = 0; // default: off
 
-  String _corePath = '';
+  String _corePath   = '';
+  bool   _coreExists = true;
 
   @override
   void initState() {
@@ -59,6 +61,7 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
       _filterIdx     = _filterOptions.indexOf(filter).clamp(0, _filterOptions.length - 1);
       _frameDupesIdx = _frameDupesOptions.indexOf(frameDupes).clamp(0, _frameDupesOptions.length - 1);
       _corePath      = core;
+      _coreExists    = File(core).existsSync();
       _loading       = false;
     });
   }
@@ -67,15 +70,15 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
     if (ModalRoute.of(context)?.isCurrent != true) return;
     switch (action) {
       case GamepadAction.up:
-        setState(() => _selectedIndex = (_selectedIndex - 1).clamp(0, 5));
+        setState(() => _selectedIndex = (_selectedIndex - 1).clamp(0, 4));
       case GamepadAction.down:
-        setState(() => _selectedIndex = (_selectedIndex + 1).clamp(0, 5));
+        setState(() => _selectedIndex = (_selectedIndex + 1).clamp(0, 4));
       case GamepadAction.left:
         _cycleValue(-1);
       case GamepadAction.right:
         _cycleValue(1);
       case GamepadAction.confirm:
-        if (_selectedIndex == 5) _resetAll();
+        if (_selectedIndex == 4) _resetAll();
       case GamepadAction.back:
         Navigator.pop(context);
       default:
@@ -168,16 +171,14 @@ class _Nintendo64SettingsPageState extends State<Nintendo64SettingsPage> {
                     canLeft:  _frameDupesIdx > 0,
                     canRight: _frameDupesIdx < _frameDupesOptions.length - 1,
                   ),
-                  _InfoRow(
-                    icon: Icons.memory,
-                    label: 'Core RetroArch',
-                    value: _corePath,
-                    selected: _selectedIndex == 4,
+                  _CoreInfoRow(
+                    path: _corePath,
+                    exists: _coreExists,
                   ),
                   _ActionRow(
                     icon: Icons.restore,
                     label: 'Restaurar padrões',
-                    selected: _selectedIndex == 5,
+                    selected: _selectedIndex == 4,
                   ),
                 ],
               ),
@@ -256,54 +257,53 @@ class _OptionRow extends StatelessWidget {
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.selected,
-  });
+class _CoreInfoRow extends StatelessWidget {
+  const _CoreInfoRow({required this.path, required this.exists});
 
-  final IconData icon;
-  final String label;
-  final String value;
-  final bool selected;
+  final String path;
+  final bool exists;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 80, vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       decoration: BoxDecoration(
-        color: selected ? Colors.white : Colors.white10,
+        color: exists ? Colors.white10 : Colors.red.withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
+        border: exists ? null : Border.all(color: Colors.red.withOpacity(0.6)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: selected ? Colors.black : Colors.white54, size: 22),
+          Icon(Icons.memory, color: exists ? Colors.white54 : Colors.red, size: 22),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
+                  'Core RetroArch',
                   style: TextStyle(
-                    color: selected ? Colors.black : Colors.white,
+                    color: exists ? Colors.white : Colors.red,
                     fontSize: 18,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  value,
+                  path,
                   style: TextStyle(
-                    color: selected ? Colors.black45 : Colors.white38,
+                    color: exists ? Colors.white38 : Colors.red.withOpacity(0.7),
                     fontSize: 13,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (!exists) ...[
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Arquivo não encontrado — os jogos não abrirão',
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ],
               ],
             ),
           ),
