@@ -9,6 +9,7 @@
     tmux
     file
     binutils
+    git
     retroarch
     libretro.mupen64plus
   ];

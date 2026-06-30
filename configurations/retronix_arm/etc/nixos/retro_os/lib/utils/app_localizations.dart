@@ -28,6 +28,17 @@ class AppLocalizations {
 
   String get systemSettingsTitle => _pick('System Settings', 'Configurações do Sistema');
 
+  // ── Update System Page ────────────────────────────────────────────────────
+
+  String get updateSystem      => _pick('Update System', 'Atualizar Sistema');
+  String get updateTitle       => _pick('System Update', 'Atualização do Sistema');
+  String get updateIdle        => _pick('Press confirm to start the update', 'Pressione confirmar para iniciar a atualização');
+  String get updateRunning     => _pick('Updating...', 'Atualizando...');
+  String get updateSuccess     => _pick('Update complete. Restart recommended.', 'Atualização concluída. Reinicialização recomendada.');
+  String get updateError       => _pick('Update failed.', 'Falha na atualização.');
+  String get updateBackHint      => _pick('Back to cancel / return', 'Voltar para cancelar / retornar');
+  String get updateRebootQuestion => _pick('Update complete. Restart the system?', 'Atualização concluída, deseja reiniciar o sistema?');
+
   // ── Console Selector ──────────────────────────────────────────────────────
 
   String get selectConsole  => _pick('SELECT CONSOLE', 'SELECIONAR CONSOLE');

@@ -8,6 +8,7 @@ import '../utils/dialogs.dart';
 import '../utils/app_localizations.dart';
 import 'nintendo64_games_page.dart';
 import 'system_settings_page.dart';
+import 'update_system_page.dart';
 import 'nintendo64_settings_page.dart';
 import 'shutdown_page.dart';
 
@@ -103,6 +104,14 @@ class _ConsoleSelectorPageState extends State<ConsoleSelectorPage> {
           onSelect: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SystemSettingsPage()),
+          ),
+        ),
+        SettingsOption(
+          label: l.updateSystem,
+          icon: Icons.system_update_alt,
+          onSelect: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const UpdateSystemPage()),
           ),
         ),
         SettingsOption(
