@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../services/gamepad_service.dart';
 import '../utils/debug_logger.dart';
 import '../utils/devices.dart';
 import '../utils/settings_service.dart';
@@ -31,7 +33,6 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
     }
 
     final corePath = await SettingsService.instance.n64CorePath();
-
     if (!File(corePath).existsSync()) {
       DebugLogger.log('[Nintendo64GameOpen] core not found: $corePath');
       if (mounted) Navigator.pop(context, 'Core não encontrado: $corePath');
@@ -50,11 +51,15 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
       );
       DebugLogger.log('[Nintendo64GameOpen] retroarch launched (pid: ${process.pid})');
 
+      final sub = _watchExitCombo(process);
+
       final exitCode = await process.exitCode;
+      sub.cancel();
       DebugLogger.log('[Nintendo64GameOpen] retroarch exited with code: $exitCode');
 
       if (!mounted) return;
-      if (exitCode != 0) {
+      if (exitCode != 0 && exitCode != -15) {
+        // -15 = SIGTERM (kill normal), não é erro
         Navigator.pop(context, 'RetroArch encerrou com erro (código $exitCode)');
       } else {
         Navigator.pop(context);
@@ -63,6 +68,24 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
       DebugLogger.log('[Nintendo64GameOpen] failed to launch retroarch: $e');
       if (mounted) Navigator.pop(context, 'Falha ao iniciar RetroArch: $e');
     }
+  }
+
+  // Escuta Start + Select dentro de 600ms para matar o processo.
+  StreamSubscription<GamepadAction> _watchExitCombo(Process process) {
+    final recent = <GamepadAction>{};
+
+    return GamepadService.instance.actions.listen((action) {
+      if (action != GamepadAction.start && action != GamepadAction.select) return;
+
+      recent.add(action);
+      Future.delayed(const Duration(milliseconds: 600), () => recent.remove(action));
+
+      if (recent.contains(GamepadAction.start) &&
+          recent.contains(GamepadAction.select)) {
+        DebugLogger.log('[Nintendo64GameOpen] exit combo detected — killing retroarch');
+        process.kill();
+      }
+    });
   }
 
   @override
@@ -82,6 +105,11 @@ class _Nintendo64GameOpenState extends State<Nintendo64GameOpen> {
                 fontSize: 20,
                 letterSpacing: 3,
               ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Start + Select para sair',
+              style: TextStyle(color: Colors.white24, fontSize: 13),
             ),
           ],
         ),
