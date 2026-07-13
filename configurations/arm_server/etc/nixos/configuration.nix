@@ -16,6 +16,8 @@
     cores = 0;
   };
 
+  swapDevices = [{ device = "/swapfile"; size = 4096; }];
+
   zramSwap = {
     enable = true;
     algorithm = "zstd";

@@ -7,7 +7,7 @@ let
       owner = "ptitSeb";
       repo = "box64";
       rev = "main";
-      sha256 = "sha256-ok6CXAmHcT7uzNfIeJSzb4cAr7wmYuJDK1kOwkeLjF4=";
+      sha256 = "sha256-ZTKOioqvBcfLsXlEa8hJIxVxQaOPjhpJlibRQZgp0qU=";
     };
     enableParallelBuilding = false;
     patches = (oldAttrs.patches or []) ++ [
@@ -20,7 +20,7 @@ let
       "-DRPI4ARM64=1"
       "-DBOX32=ON"
       "-DBOX32_BINFMT=ON"
-      "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+      "-DCMAKE_BUILD_TYPE=Release"
     ];
   });
 
