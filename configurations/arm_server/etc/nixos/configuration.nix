@@ -10,6 +10,7 @@
       ./users.nix
       ./box64.nix
       ./dotnet.nix
+#     ./generic-server.nix
     ];
 
   nix.settings = {
