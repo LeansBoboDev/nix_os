@@ -37,6 +37,16 @@
   # Time zone.
   time.timeZone = "America/SaoPaulo";
 
+  # Keep logs in RAM only — avoids SD card write wear.
+  # Storage=volatile in journald triggers LSE code paths in libsystemd (compiled
+  # for ARMv8.1+ in nixpkgs), causing SIGILL on Raspberry Pi 4 (ARMv8.0).
+  # Mounting /var/log as tmpfs achieves the same result without touching journald.
+  fileSystems."/var/log" = {
+    device = "tmpfs";
+    fsType = "tmpfs";
+    options = [ "size=50M" "mode=755" "nosuid" "nodev" "noexec" ];
+  };
+
   # Open SSH
   services.openssh = {
     enable = true;
