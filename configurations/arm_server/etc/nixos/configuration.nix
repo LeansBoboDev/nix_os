@@ -9,6 +9,7 @@
       ./packages.nix
       ./users.nix
       ./box64.nix
+      ./dotnet.nix
     ];
 
   nix.settings = {
