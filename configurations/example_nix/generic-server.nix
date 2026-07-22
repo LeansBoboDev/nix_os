@@ -1,7 +1,7 @@
 # This is a script for you as example for a automatic process
 # that starts with the system and automatically restarts at 00:00
 
-{ pkgs, ... }:
+{ ... }:
 
 {
   systemd.services.generic-server = {
@@ -15,6 +15,8 @@
       ExecStart = "/home/generic-user/generic-server/start.sh";
       Restart = "on-failure";
       RestartSec = "10s";
+      # Expose all system packages — systemd services don't inherit the user PATH.
+      Environment = "PATH=/run/current-system/sw/bin:/run/wrappers/bin";
     };
   };
 
@@ -32,7 +34,7 @@
     description = "Restart generic server";
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.systemd}/bin/systemctl restart generic-server.service";
+      ExecStart = "/run/current-system/sw/bin/systemctl restart generic-server.service";
     };
   };
 }
