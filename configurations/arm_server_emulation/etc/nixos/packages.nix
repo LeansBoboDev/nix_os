@@ -10,6 +10,7 @@
     file
     git
     binutils
+    qemu
     unzip
   ];
 }

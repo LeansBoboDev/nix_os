@@ -4,9 +4,13 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./docker.nix
       ./mdns.nix
       ./packages.nix
       ./users.nix
+      ./box64.nix
+      ./dotnet.nix
+#     ./generic-server.nix
     ];
 
   nix.settings = {
@@ -65,7 +69,7 @@
       session required pam_unix.so
     '';
   };
-
+  
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
