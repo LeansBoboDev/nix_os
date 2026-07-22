@@ -1,5 +1,7 @@
 { config, lib, pkgs, ... }:
 {
+  # Don't forget to add the group "docker" to the user you want to use docker
+
   # Workaround for https://github.com/NixOS/nixpkgs/issues/392673
   nixpkgs.overlays = [
     (final: previous: {
