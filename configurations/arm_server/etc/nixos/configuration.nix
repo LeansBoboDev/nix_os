@@ -9,11 +9,6 @@
       ./users.nix
     ];
 
-  nix.settings = {
-    max-jobs = 1;
-    cores = 0;
-  };
-
   swapDevices = [{ device = "/swapfile"; size = 4096; }];
 
   zramSwap = {

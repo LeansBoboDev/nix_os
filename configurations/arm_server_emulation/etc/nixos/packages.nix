@@ -4,6 +4,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
+    curl
     sudo
     htop
     tmux

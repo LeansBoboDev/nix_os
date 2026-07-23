@@ -9,14 +9,7 @@
       ./packages.nix
       ./users.nix
       ./box64.nix
-      ./dotnet.nix
-#     ./generic-server.nix
     ];
-
-  nix.settings = {
-    max-jobs = 1;
-    cores = 0;
-  };
 
   swapDevices = [{ device = "/swapfile"; size = 4096; }];
 
