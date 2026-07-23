@@ -24,7 +24,6 @@
 
   networking.hostName = "dont_forget_to_change_the_machine_name_here_alright_interrogation_pontuation";
   networking.networkmanager.enable = true;
-  networking.firewall.enable = false;
 
   # Time zone.
   time.timeZone = "America/SaoPaulo";

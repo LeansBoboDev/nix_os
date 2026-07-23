@@ -12,6 +12,7 @@
 ## Some security dependencies
 ```
     gnupg
+    pinentry-curses
 ```
 
 ## Random dependencies
