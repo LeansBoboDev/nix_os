@@ -47,11 +47,21 @@
     ];
   };
 
-  # Make sure the external disk is mounted before MariaDB starts, otherwise
-  # it may initialize a fresh database directly on the empty mount point.
-  # Unit name is the mount path with "/" turned into "-" (systemd-escape).
+  # Create the dataDir on the external disk before MariaDB starts. Required
+  # because mysql.service's own sandboxing (mount namespacing) fails with
+  # "No such file or directory" if this path doesn't exist yet - which is
+  # always true on a freshly mounted/empty disk. "d" creates it if missing
+  # and fixes ownership/mode on every boot; harmless once it already exists.
+  systemd.tmpfiles.rules = [
+    "d /srv/mariadb/mysql 0700 mysql mysql - -"
+  ];
+
+  # Make sure the external disk is mounted, and the dataDir created above,
+  # before MariaDB starts. Otherwise it may fail to start (empty mount point)
+  # or initialize a fresh database directly on it. Unit name is the mount
+  # path with "/" turned into "-" (systemd-escape).
   systemd.services.mysql = {
-    after = [ "srv-mariadb.mount" ];
+    after = [ "srv-mariadb.mount" "systemd-tmpfiles-setup.service" ];
     requires = [ "srv-mariadb.mount" ];
   };
 }
