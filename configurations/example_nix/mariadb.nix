@@ -14,16 +14,8 @@
     };
 
     ensureDatabases = [ "database_name_change_it_ok" ];
-    ensureUsers = [
-      {
-        # Auth is via unix socket (peer auth): the Linux user "linux_user_name_change_itok_probably_will_be_admin"
-        # connects as this MySQL user with no password. Create that Linux user
-        # (or add its name here to match an existing one) before relying on this.
-        name = "linux_user_name_change_it_ok_probably_will_be_admin";
-        ensurePermissions = {
-          "database_name_change_it_ok.*" = "ALL PRIVILEGES";
-        };
-      }
-    ];
+
+    # After the service is up, create the user manually:
+    # sudo mysql -e "CREATE USER 'username'@'%' IDENTIFIED BY 'strong_password'; GRANT ALL PRIVILEGES ON database_name_change_it_ok.* TO 'username'@'%'; FLUSH PRIVILEGES;"
   };
 }
