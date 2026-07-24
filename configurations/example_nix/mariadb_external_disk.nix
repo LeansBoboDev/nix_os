@@ -8,6 +8,10 @@
   fileSystems."/srv/mariadb" = {
     device = "/dev/disk/by-uuid/change_it_to_the_disk_uuid_using_lsblk";
     fsType = "ext4";
+    # If the disk is unplugged, boot continues normally instead of waiting/
+    # dropping to emergency mode. mysql.service still won't start without it
+    # (see the requires/after below).
+    options = [ "nofail" ];
   };
 
   services.mysql = {
